@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: HTML Parser
+
+
+Parameters:
+
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+
+
+Mappings:
+
+  EnvironmentMap:
+    dev:
+      origin: "'*'"
+    prod:
+      origin: "'*'"
+
+
+Globals:
+
+  Api:
+    Cors:
+      AllowHeaders: "'*'"
+      AllowMethods: "'POST, OPTIONS'"
+      AllowOrigin: !FindInMap [EnvironmentMap, !Ref Environment, origin]
+
+  Function:
+    Timeout: 15
+    Handler: main
+    Runtime: go1.x
+    Tracing: Active
+    MemorySize: 256
+    Environment:
+      Variables:
+        ALLOWORIGIN: !FindInMap [EnvironmentMap, !Ref Environment, origin]
+        ENVIRONMENT: !Ref Environment
+
+
+Resources:
+
+  HTMLParserFunction:
+    Metadata:
+      BuildMethod: makefile
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "html-parser-${Environment}"
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /html-parser
+            RestApiId:
+              Ref: HTMLParserRESTApi
+
+  HTMLParserRESTApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "html-parser-${Environment}"
+      StageName: v1
+      MinimumCompressionSize: 1400
+
+  HTMLParserApiGatewayLoggingRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+
+  HTMLParserFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DependsOn:
+      - HTMLParserFunction
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Sub /aws/lambda/${HTMLParserFunction}
+
+  ApiGwAccountConfig:
+    Type: "AWS::ApiGateway::Account"
+    Properties:
+      CloudWatchRoleArn: !GetAtt "HTMLParserApiGatewayLoggingRole.Arn"
+
+
+Outputs:
+  RESTApiEndpoint:
+    Description: Endpoint for making a request to the HTML Parser REST API
+    Value: !Sub "https://${HTMLParserRESTApi}.execute-api.${AWS::Region}.amazonaws.com/v1/"
