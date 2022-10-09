@@ -7,10 +7,12 @@ import (
 	"github.com/dereckdamphouse/html-parser/pkg/req"
 )
 
+var htmlReader = goquery.NewDocumentFromReader
+
 func Parse(d *req.Data) (map[string][]string, error) {
 	res := make(map[string][]string)
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(d.HTML))
+	doc, err := htmlReader(strings.NewReader(d.HTML))
 	if err != nil {
 		return res, err
 	}
