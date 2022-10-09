@@ -1,34 +1,32 @@
 package resp
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 )
 
-const DefaultBody = "{}"
+var headers = map[string]string{
+	"Content-Type":                "application/json",
+	"Access-Control-Allow-Origin": allowOrigin(),
+}
 
-var (
-	headers = map[string]string{
-		"Content-Type":                "application/json",
-		"Access-Control-Allow-Origin": allowOrigin(),
+func Error(code int, msg string) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
+		StatusCode: code,
+		Body:       fmt.Sprintf("{\"error\":\"%s\",\"found\":{}}", msg),
+		Headers:    headers,
 	}
-	StatusOK = events.APIGatewayProxyResponse{
+}
+
+func Success(body string) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       DefaultBody,
+		Body:       body,
 		Headers:    headers,
 	}
-	StatusInternalServerError = events.APIGatewayProxyResponse{
-		StatusCode: 500,
-		Body:       DefaultBody,
-		Headers:    headers,
-	}
-	StatusBadRequest = events.APIGatewayProxyResponse{
-		StatusCode: 400,
-		Body:       DefaultBody,
-		Headers:    headers,
-	}
-)
+}
 
 func allowOrigin() string {
 	ao := os.Getenv("ALLOWORIGIN")

@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -15,7 +15,7 @@ import (
 
 type deps struct {
 	parse     func(data *req.Data) (map[string][]string, error)
-	marshal   func(v any) ([]byte, error)
+	marshal   func(found any) (string, error)
 	unmarshal func(body string) (*req.Data, error)
 }
 
@@ -25,7 +25,7 @@ func (d *deps) init() {
 	}
 
 	if d.marshal == nil {
-		d.marshal = json.Marshal
+		d.marshal = resp.Marshal
 	}
 
 	if d.unmarshal == nil {
@@ -42,31 +42,26 @@ func (d *deps) handler(ctx context.Context, pxyReq events.APIGatewayProxyRequest
 
 	data, err := d.unmarshal(pxyReq.Body)
 	if err != nil {
-		log.Instance.Error("failed to unmarshal request body",
-			zap.String("requestId", reqID),
-			zap.Error(err))
-		return resp.StatusBadRequest, nil
+		errMsg := "failed to marshal request body ('html' or 'properties' field may be missing)"
+		log.Instance.Error(errMsg, zap.String("requestId", reqID), zap.Error(err))
+		return resp.Error(http.StatusBadRequest, errMsg), nil
 	}
 
-	res, err := d.parse(data)
+	found, err := d.parse(data)
 	if err != nil {
-		log.Instance.Error("failed to parse html",
-			zap.String("requestId", reqID),
-			zap.Error(err))
-		return resp.StatusBadRequest, nil
+		errMsg := "failed to parse html"
+		log.Instance.Error(errMsg, zap.String("requestId", reqID), zap.Error(err))
+		return resp.Error(http.StatusBadRequest, errMsg), nil
 	}
 
-	jsonByte, err := d.marshal(res)
+	body, err := d.marshal(found)
 	if err != nil {
-		log.Instance.Error("failed to marshal response body",
-			zap.String("requestId", reqID),
-			zap.Error(err))
-		return resp.StatusInternalServerError, nil
+		errMsg := "failed to marshal response body"
+		log.Instance.Error(errMsg, zap.String("requestId", reqID), zap.Error(err))
+		return resp.Error(http.StatusInternalServerError, errMsg), nil
 	}
 
-	resp.StatusOK.Body = string(jsonByte)
-
-	return resp.StatusOK, nil
+	return resp.Success(body), nil
 }
 
 func main() {

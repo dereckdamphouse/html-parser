@@ -7,7 +7,6 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/dereckdamphouse/html-parser/pkg/req"
-	"github.com/dereckdamphouse/html-parser/pkg/resp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +33,7 @@ func TestHandler(t *testing.T) {
 					return &req.Data{}, fmt.Errorf("some error")
 				},
 			},
-			resp.DefaultBody,
+			"{\"error\":\"failed to marshal request body ('html' or 'properties' field may be missing)\",\"found\":{}}",
 			400,
 			nil,
 		},
@@ -48,7 +47,7 @@ func TestHandler(t *testing.T) {
 					return map[string][]string{}, fmt.Errorf("some error")
 				},
 			},
-			resp.DefaultBody,
+			"{\"error\":\"failed to parse html\",\"found\":{}}",
 			400,
 			nil,
 		},
@@ -61,11 +60,11 @@ func TestHandler(t *testing.T) {
 				parse: func(data *req.Data) (map[string][]string, error) {
 					return map[string][]string{}, nil
 				},
-				marshal: func(v any) ([]byte, error) {
-					return []byte{}, fmt.Errorf("some error")
+				marshal: func(found any) (string, error) {
+					return "", fmt.Errorf("some error")
 				},
 			},
-			resp.DefaultBody,
+			"{\"error\":\"failed to marshal response body\",\"found\":{}}",
 			500,
 			nil,
 		},
@@ -78,8 +77,8 @@ func TestHandler(t *testing.T) {
 				parse: func(data *req.Data) (map[string][]string, error) {
 					return map[string][]string{}, nil
 				},
-				marshal: func(v any) ([]byte, error) {
-					return []byte("success!"), nil
+				marshal: func(found any) (string, error) {
+					return "success!", nil
 				},
 			},
 			"success!",

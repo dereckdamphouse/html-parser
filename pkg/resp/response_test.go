@@ -1,14 +1,24 @@
 package resp
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func testCleanUp() {
-	os.Setenv("ALLOWORIGIN", "")
+func TestError(t *testing.T) {
+	res := Error(http.StatusBadRequest, "some error")
+	assert.Equal(t, res.Body, fmt.Sprintf("{\"error\":\"%s\",\"found\":{}}", "some error"))
+	assert.Equal(t, res.StatusCode, http.StatusBadRequest)
+}
+
+func TestSuccess(t *testing.T) {
+	res := Success("{\"found\":{}}")
+	assert.Equal(t, res.Body, "{\"found\":{}}")
+	assert.Equal(t, res.StatusCode, 200)
 }
 
 func TestAllowOrigin(t *testing.T) {
@@ -52,5 +62,5 @@ func TestAllowOrigin(t *testing.T) {
 		})
 	}
 
-	testCleanUp()
+	os.Setenv("ALLOWORIGIN", "")
 }

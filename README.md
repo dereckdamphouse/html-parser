@@ -9,7 +9,7 @@ This project is a tool for exposing HTML parsing via a REST API endpoint.
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) - v1.51
 
 ## JavaScript Example
-
+**API Request**
 ```javascript
 const url = 'https://.../v1/html-parser';
 
@@ -19,6 +19,10 @@ const body = {
     {
       name: 'title',
       selector: '.product .title',
+    },
+    {
+      name: 'fabric',
+      selector: '.product .fabric',
     },
     {
       name: 'image',
@@ -36,4 +40,23 @@ const options = {
 return fetch(url, options)
   .then((response) => response.json())
   .catch((e) => console.log(e));
+```
+**API Response**
+```yaml
+{
+  "error" "",
+  "found": {
+    "title": [
+      "Men's Columbia Flattop Ridge Fleece Jacket"
+    ],
+    "image": [
+      "https://movableink-inkredible-retail.herokuapp.com/images/clothing/2599191_ALT-1000.jpg"
+    ],
+    "fabric": [
+      "Polyester fleece",
+      "Machine wash",
+      "Imported",
+    ],
+  },
+}
 ```
