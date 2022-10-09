@@ -1,5 +1,5 @@
 # HTML Parser
-This project is a tool for exposing HTML parsing via a REST API endpoint.
+This project is a tool for providing HTML parsing via a REST API endpoint.
 
 ## Prerequisites
 **CLI Tools**
