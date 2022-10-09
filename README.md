@@ -7,7 +7,7 @@ This project is a tool for exposing HTML parsing via a REST API endpoint.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) - v2.7.6
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) - v1.51
 
-## JavaScript Example
+## Example
 **API Request**
 ```javascript
 const url = 'https://.../v1/html-parser';
