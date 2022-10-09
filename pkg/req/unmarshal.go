@@ -5,33 +5,22 @@ import (
 	"fmt"
 )
 
-type Selector struct {
-	Key       string
-	Selector  string
-	Attribute string
-}
-
-type Body struct {
-	HTML      string
-	Selectors []Selector
-}
-
 var unmarshaler = json.Unmarshal
 
-func Unmarshal(reqBody string) (*Body, error) {
-	var b Body
+func Unmarshal(body string) (*Data, error) {
+	var d Data
 
-	if err := unmarshaler([]byte(reqBody), &b); err != nil {
-		return &b, err
+	if err := unmarshaler([]byte(body), &d); err != nil {
+		return &Data{}, err
 	}
 
-	if b.HTML == "" {
-		return &b, fmt.Errorf("request body is missing 'html' field")
+	if d.HTML == "" {
+		return &Data{}, fmt.Errorf("request body is missing 'html' field")
 	}
 
-	if len(b.Selectors) == 0 {
-		return &b, fmt.Errorf("request body is missing 'selectors' field")
+	if len(d.Properties) == 0 {
+		return &Data{}, fmt.Errorf("request body is missing 'properties' field")
 	}
 
-	return &b, nil
+	return &d, nil
 }

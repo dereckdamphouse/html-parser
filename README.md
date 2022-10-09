@@ -1,4 +1,5 @@
 # HTML Parser
+This project is a tool for exposing HTML parsing via a REST API endpoint.
 
 ## Prerequisites
 
@@ -14,11 +15,17 @@ const url = 'https://.../v1/html-parser';
 
 const body = {
   html: '<html>...</html>',
-  selectors: [{
-    key: 'image',
-    selector: '.product img',
-    attribute: 'src',
-  }]
+  properties: [
+    {
+      name: 'title',
+      selector: '.product .title',
+    },
+    {
+      name: 'image',
+      selector: '.product img',
+      attribute: 'src',
+    },
+  ],
 };
 
 const options = {

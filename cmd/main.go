@@ -6,22 +6,22 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/dereckdamphouse/html-parser/pkg/html"
 	"github.com/dereckdamphouse/html-parser/pkg/log"
-	"github.com/dereckdamphouse/html-parser/pkg/psr"
 	"github.com/dereckdamphouse/html-parser/pkg/req"
-	"github.com/dereckdamphouse/html-parser/pkg/res"
+	"github.com/dereckdamphouse/html-parser/pkg/resp"
 	"go.uber.org/zap"
 )
 
 type deps struct {
-	parse     func(data *req.Body) (map[string][]string, error)
+	parse     func(data *req.Data) (map[string][]string, error)
 	marshal   func(v any) ([]byte, error)
-	unmarshal func(reqBody string) (*req.Body, error)
+	unmarshal func(body string) (*req.Data, error)
 }
 
-var initDeps = func(d *deps) error {
+func (d *deps) init() {
 	if d.parse == nil {
-		d.parse = psr.Parse
+		d.parse = html.Parse
 	}
 
 	if d.marshal == nil {
@@ -31,8 +31,6 @@ var initDeps = func(d *deps) error {
 	if d.unmarshal == nil {
 		d.unmarshal = req.Unmarshal
 	}
-
-	return nil
 }
 
 func (d *deps) handler(ctx context.Context, pxyReq events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -42,43 +40,39 @@ func (d *deps) handler(ctx context.Context, pxyReq events.APIGatewayProxyRequest
 
 	reqID := pxyReq.RequestContext.RequestID
 
-	if err := initDeps(d); err != nil {
-		log.Instance.Error("unable to init dependencies",
-			zap.String("requestId", reqID),
-			zap.Error(err))
-		return res.StatusInternalServerError, nil
-	}
-
-	b, err := d.unmarshal(pxyReq.Body)
+	data, err := d.unmarshal(pxyReq.Body)
 	if err != nil {
 		log.Instance.Error("failed to unmarshal request body",
 			zap.String("requestId", reqID),
 			zap.Error(err))
-		return res.StatusBadRequest, nil
+		return resp.StatusBadRequest, nil
 	}
 
-	data, err := d.parse(b)
+	res, err := d.parse(data)
 	if err != nil {
 		log.Instance.Error("failed to parse html",
 			zap.String("requestId", reqID),
 			zap.Error(err))
-		return res.StatusInternalServerError, nil
+		return resp.StatusBadRequest, nil
 	}
 
-	jsonStr, err := d.marshal(data)
+	jsonByte, err := d.marshal(res)
 	if err != nil {
 		log.Instance.Error("failed to marshal response body",
 			zap.String("requestId", reqID),
 			zap.Error(err))
-		return res.StatusInternalServerError, nil
+		return resp.StatusInternalServerError, nil
 	}
 
-	res.StatusOK.Body = string(jsonStr)
+	resp.StatusOK.Body = string(jsonByte)
 
-	return res.StatusOK, nil
+	return resp.StatusOK, nil
 }
 
 func main() {
 	d := &deps{}
+
+	d.init()
+
 	lambda.Start(d.handler)
 }

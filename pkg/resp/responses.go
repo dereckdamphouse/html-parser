@@ -1,4 +1,4 @@
-package res
+package resp
 
 import (
 	"os"

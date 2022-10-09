@@ -1,4 +1,4 @@
-package psr
+package html
 
 import (
 	"strings"
@@ -7,20 +7,20 @@ import (
 	"github.com/dereckdamphouse/html-parser/pkg/req"
 )
 
-func Parse(b *req.Body) (map[string][]string, error) {
+func Parse(d *req.Data) (map[string][]string, error) {
 	res := make(map[string][]string)
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(b.HTML))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(d.HTML))
 	if err != nil {
 		return res, err
 	}
 
-	for _, sel := range b.Selectors {
-		key := sel.Key
-		selector := sel.Selector
-		attribute := sel.Attribute
+	for _, prop := range d.Properties {
+		name := prop.Name
+		selector := prop.Selector
+		attribute := prop.Attribute
 
-		if key == "" || selector == "" {
+		if name == "" || selector == "" {
 			continue
 		}
 
@@ -28,10 +28,10 @@ func Parse(b *req.Body) (map[string][]string, error) {
 			if attribute != "" {
 				att, ok := s.Attr(attribute)
 				if att != "" && ok {
-					res[key] = append(res[key], att)
+					res[name] = append(res[name], att)
 				}
 			} else {
-				res[key] = append(res[key], s.Text())
+				res[name] = append(res[name], s.Text())
 			}
 		})
 	}

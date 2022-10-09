@@ -17,7 +17,6 @@ test:
 	@echo "running tests with race flag..."
 	@go test ./... -race -coverprofile cover.out
 	@go tool cover -func cover.out | grep total:
-	@echo "all tests passed"
 
 build: test
 	@echo "building ${CONFIG_ENV} handler for AWS Lambda"

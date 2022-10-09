@@ -7,54 +7,95 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/dereckdamphouse/html-parser/pkg/req"
-	"github.com/dereckdamphouse/html-parser/pkg/res"
+	"github.com/dereckdamphouse/html-parser/pkg/resp"
 	"github.com/stretchr/testify/assert"
 )
 
+func TestInit(t *testing.T) {
+	d := &deps{}
+	d.init()
+	assert.NotNil(t, d.marshal)
+	assert.NotNil(t, d.parse)
+	assert.NotNil(t, d.unmarshal)
+}
+
 func TestHandler(t *testing.T) {
 	tt := []struct {
-		name     string
-		d        *deps
-		initDeps func(d *deps) error
-		resBody  string
-		resCode  int
-		err      error
+		name string
+		d    *deps
+		body string
+		code int
+		err  error
 	}{
 		{
-			"handles initDeps error",
-			&deps{},
-			func(d *deps) error {
-				return fmt.Errorf("some error")
+			"handles unmarshal error",
+			&deps{
+				unmarshal: func(body string) (*req.Data, error) {
+					return &req.Data{}, fmt.Errorf("some error")
+				},
 			},
-			res.DefaultBody,
+			resp.DefaultBody,
+			400,
+			nil,
+		},
+		{
+			"handles parsing error",
+			&deps{
+				unmarshal: func(body string) (*req.Data, error) {
+					return &req.Data{}, nil
+				},
+				parse: func(data *req.Data) (map[string][]string, error) {
+					return map[string][]string{}, fmt.Errorf("some error")
+				},
+			},
+			resp.DefaultBody,
+			400,
+			nil,
+		},
+		{
+			"handles marshal error",
+			&deps{
+				unmarshal: func(body string) (*req.Data, error) {
+					return &req.Data{}, nil
+				},
+				parse: func(data *req.Data) (map[string][]string, error) {
+					return map[string][]string{}, nil
+				},
+				marshal: func(v any) ([]byte, error) {
+					return []byte{}, fmt.Errorf("some error")
+				},
+			},
+			resp.DefaultBody,
 			500,
 			nil,
 		},
 		{
-			"handles unmarshal error",
+			"handles successfull response",
 			&deps{
-				unmarshal: func(reqBody string) (*req.Body, error) {
-					return &req.Body{}, fmt.Errorf("some error")
+				unmarshal: func(body string) (*req.Data, error) {
+					return &req.Data{}, nil
+				},
+				parse: func(data *req.Data) (map[string][]string, error) {
+					return map[string][]string{}, nil
+				},
+				marshal: func(v any) ([]byte, error) {
+					return []byte("success!"), nil
 				},
 			},
-			func(d *deps) error {
-				return nil
-			},
-			res.DefaultBody,
-			400,
+			"success!",
+			200,
 			nil,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			initDeps = tc.initDeps
 			res, err := tc.d.handler(
 				context.TODO(),
 				events.APIGatewayProxyRequest{},
 			)
-			assert.Equal(t, tc.resBody, res.Body)
-			assert.Equal(t, tc.resCode, res.StatusCode)
+			assert.Equal(t, tc.body, res.Body)
+			assert.Equal(t, tc.code, res.StatusCode)
 			assert.Equal(t, tc.err, err)
 		})
 	}

@@ -1,4 +1,4 @@
-package res
+package resp
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testsCleanUp() {
+func testCleanUp() {
 	os.Setenv("ALLOWORIGIN", "")
 }
 
@@ -52,5 +52,5 @@ func TestAllowOrigin(t *testing.T) {
 		})
 	}
 
-	testsCleanUp()
+	testCleanUp()
 }
