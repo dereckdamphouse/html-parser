@@ -21,8 +21,8 @@ const body = {
       selector: '.product .title',
     },
     {
-      name: 'fabric',
-      selector: '.product .fabric',
+      name: 'details',
+      selector: '.product .details ul li',
     },
     {
       name: 'image',
@@ -52,7 +52,7 @@ return fetch(url, options)
     "image": [
       "https://movableink-inkredible-retail.herokuapp.com/images/clothing/2599191_ALT-1000.jpg"
     ],
-    "fabric": [
+    "details": [
       "Polyester fleece",
       "Machine wash",
       "Imported",
