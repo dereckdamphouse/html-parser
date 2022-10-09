@@ -43,7 +43,7 @@ return fetch(url, options)
 **API Response**
 ```yaml
 {
-  "error" "",
+  "error": "",
   "found": {
     "title": [
       "Men's Columbia Flattop Ridge Fleece Jacket"
