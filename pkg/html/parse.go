@@ -33,7 +33,10 @@ func Parse(d *req.Data) (map[string][]string, error) {
 					res[name] = append(res[name], att)
 				}
 			} else {
-				res[name] = append(res[name], s.Text())
+				text := s.Text()
+				if text != "" {
+					res[name] = append(res[name], text)
+				}
 			}
 		})
 	}
