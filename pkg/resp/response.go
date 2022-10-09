@@ -9,24 +9,23 @@ import (
 const DefaultBody = "{}"
 
 var (
-	body    = DefaultBody
 	headers = map[string]string{
 		"Content-Type":                "application/json",
 		"Access-Control-Allow-Origin": allowOrigin(),
 	}
 	StatusOK = events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       body,
+		Body:       DefaultBody,
 		Headers:    headers,
 	}
 	StatusInternalServerError = events.APIGatewayProxyResponse{
 		StatusCode: 500,
-		Body:       body,
+		Body:       DefaultBody,
 		Headers:    headers,
 	}
 	StatusBadRequest = events.APIGatewayProxyResponse{
 		StatusCode: 400,
-		Body:       body,
+		Body:       DefaultBody,
 		Headers:    headers,
 	}
 )
