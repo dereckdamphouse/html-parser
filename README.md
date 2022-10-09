@@ -2,7 +2,6 @@
 This project is a tool for exposing HTML parsing via a REST API endpoint.
 
 ## Prerequisites
-
 **CLI Tools**
 - [Go](https://golang.org/doc/install) - v1.19.2
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) - v2.7.6
