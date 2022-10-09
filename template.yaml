@@ -30,7 +30,7 @@ Globals:
       AllowOrigin: !FindInMap [EnvironmentMap, !Ref Environment, origin]
 
   Function:
-    Timeout: 15
+    Timeout: 10
     Handler: main
     Runtime: go1.x
     Tracing: Active
