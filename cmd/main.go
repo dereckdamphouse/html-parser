@@ -14,8 +14,8 @@ import (
 )
 
 type deps struct {
-	parse     func(data *req.Data) (map[string][]string, error)
-	marshal   func(found any) (string, error)
+	parse     func(data *req.Data) (html.Parsed, error)
+	marshal   func(parsed html.Parsed) (string, error)
 	unmarshal func(body string) (*req.Data, error)
 }
 
@@ -47,14 +47,20 @@ func (d *deps) handler(ctx context.Context, pxyReq events.APIGatewayProxyRequest
 		return resp.Error(http.StatusBadRequest, errMsg), nil
 	}
 
-	found, err := d.parse(data)
+	parsed, err := d.parse(data)
 	if err != nil {
 		errMsg := "failed to parse html"
 		log.Instance.Error(errMsg, zap.String("requestId", reqID), zap.Error(err))
 		return resp.Error(http.StatusBadRequest, errMsg), nil
 	}
 
-	body, err := d.marshal(found)
+	if len(parsed) == 0 {
+		errMsg := "no properties found"
+		log.Instance.Error(errMsg, zap.String("requestId", reqID), zap.Error(err))
+		return resp.Error(http.StatusBadRequest, errMsg), nil
+	}
+
+	body, err := d.marshal(parsed)
 	if err != nil {
 		errMsg := "failed to marshal response body"
 		log.Instance.Error(errMsg, zap.String("requestId", reqID), zap.Error(err))

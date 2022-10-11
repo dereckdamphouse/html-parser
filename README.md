@@ -40,22 +40,25 @@ return fetch(url, options)
   .then((response) => response.json())
   .catch((e) => console.log(e));
 ```
-**API Response**
+**Successful Response**
 ```yaml
 {
-  "error": "",
-  "found": {
-    "title": [
-      "Men's Columbia Flattop Ridge Fleece Jacket"
-    ],
-    "image": [
-      "https://movableink-inkredible-retail.herokuapp.com/images/clothing/2599191_ALT-1000.jpg"
-    ],
-    "details": [
-      "Polyester fleece",
-      "Machine wash",
-      "Imported",
-    ],
-  },
+  "title": [
+    "Men's Columbia Flattop Ridge Fleece Jacket"
+  ],
+  "image": [
+    "https://movableink-inkredible-retail.herokuapp.com/images/clothing/2599191_ALT-1000.jpg"
+  ],
+  "details": [
+    "Polyester fleece",
+    "Machine wash",
+    "Imported",
+  ],
+}
+```
+**Failure Response**
+```yaml
+{
+  "error": "no properties found"
 }
 ```

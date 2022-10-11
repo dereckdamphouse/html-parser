@@ -1,16 +1,15 @@
 package resp
 
-import "encoding/json"
+import (
+	"encoding/json"
 
-type Body struct {
-	Error string `json:"error"`
-	Found any    `json:"found"`
-}
+	"github.com/dereckdamphouse/html-parser/pkg/html"
+)
 
 var marshaler = json.Marshal
 
-func Marshal(found any) (string, error) {
-	res, err := marshaler(Body{Found: found})
+func Marshal(parsed html.Parsed) (string, error) {
+	res, err := marshaler(parsed)
 	if err != nil {
 		return "", err
 	}

@@ -15,7 +15,7 @@ var headers = map[string]string{
 func Error(code int, msg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: code,
-		Body:       fmt.Sprintf("{\"error\":\"%s\",\"found\":{}}", msg),
+		Body:       fmt.Sprintf("{\"error\":\"%s\"}", msg),
 		Headers:    headers,
 	}
 }

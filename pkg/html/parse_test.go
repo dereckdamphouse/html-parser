@@ -17,7 +17,7 @@ func TestParse(t *testing.T) {
 		name       string
 		htmlReader func(r io.Reader) (*goquery.Document, error)
 		data       *req.Data
-		res        map[string][]string
+		parsed     Parsed
 		err        error
 	}{
 		{
@@ -26,7 +26,7 @@ func TestParse(t *testing.T) {
 				return nil, fmt.Errorf("some error")
 			},
 			&req.Data{},
-			make(map[string][]string),
+			Parsed{},
 			fmt.Errorf("some error"),
 		},
 		{
@@ -44,7 +44,7 @@ func TestParse(t *testing.T) {
 					},
 				},
 			},
-			make(map[string][]string),
+			Parsed{},
 			nil,
 		},
 		{
@@ -76,7 +76,7 @@ func TestParse(t *testing.T) {
 					},
 				}
 			}(),
-			map[string][]string{
+			Parsed{
 				"title":  {"Men's Columbia Flattop Ridge Fleece Jacket"},
 				"image":  {"/images/clothing/2599191_ALT-1000.jpg"},
 				"fabric": {"Polyester fleece", "Machine wash", "Imported"},
@@ -88,8 +88,8 @@ func TestParse(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			htmlReader = tc.htmlReader
-			res, err := Parse(tc.data)
-			assert.Equal(t, tc.res, res)
+			p, err := Parse(tc.data)
+			assert.Equal(t, tc.parsed, p)
 			assert.Equal(t, tc.err, err)
 		})
 	}

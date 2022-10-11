@@ -7,14 +7,16 @@ import (
 	"github.com/dereckdamphouse/html-parser/pkg/req"
 )
 
+type Parsed map[string][]string
+
 var htmlReader = goquery.NewDocumentFromReader
 
-func Parse(d *req.Data) (map[string][]string, error) {
-	res := make(map[string][]string)
+func Parse(d *req.Data) (Parsed, error) {
+	parsed := make(Parsed)
 
 	doc, err := htmlReader(strings.NewReader(d.HTML))
 	if err != nil {
-		return res, err
+		return parsed, err
 	}
 
 	for _, prop := range d.Properties {
@@ -30,16 +32,16 @@ func Parse(d *req.Data) (map[string][]string, error) {
 			if attribute != "" {
 				att, ok := s.Attr(attribute)
 				if att != "" && ok {
-					res[name] = append(res[name], att)
+					parsed[name] = append(parsed[name], att)
 				}
 			} else {
 				text := s.Text()
 				if text != "" {
-					res[name] = append(res[name], text)
+					parsed[name] = append(parsed[name], text)
 				}
 			}
 		})
 	}
 
-	return res, nil
+	return parsed, nil
 }

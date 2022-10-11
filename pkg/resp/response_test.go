@@ -11,13 +11,13 @@ import (
 
 func TestError(t *testing.T) {
 	res := Error(http.StatusBadRequest, "some error")
-	assert.Equal(t, res.Body, fmt.Sprintf("{\"error\":\"%s\",\"found\":{}}", "some error"))
+	assert.Equal(t, res.Body, fmt.Sprintf("{\"error\":\"%s\"}", "some error"))
 	assert.Equal(t, res.StatusCode, http.StatusBadRequest)
 }
 
 func TestSuccess(t *testing.T) {
-	res := Success("{\"found\":{}}")
-	assert.Equal(t, res.Body, "{\"found\":{}}")
+	res := Success("{\"image\":[\"imageUrl1\"]")
+	assert.Equal(t, res.Body, "{\"image\":[\"imageUrl1\"]")
 	assert.Equal(t, res.StatusCode, 200)
 }
 
