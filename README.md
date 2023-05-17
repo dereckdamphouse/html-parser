@@ -47,7 +47,7 @@ return fetch(url, options)
     "Men's Columbia Flattop Ridge Fleece Jacket"
   ],
   "image": [
-    "https://movableink-inkredible-retail.herokuapp.com/images/clothing/2599191_ALT-1000.jpg"
+    "https://....com/images/clothing/2599191_ALT-1000.jpg"
   ],
   "details": [
     "Polyester fleece",
