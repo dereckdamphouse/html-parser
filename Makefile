@@ -1,7 +1,7 @@
 .PHONY: init test build deploy build-HTMLParserFunction
 
 REGION=eu-west-2
-AWS_PROFILE=dereck-damphouse
+AWS_PROFILE=default
 
 ifeq ($(env), prod)
 CONFIG_ENV=prod
