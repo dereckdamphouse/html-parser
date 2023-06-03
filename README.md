@@ -1,5 +1,8 @@
 # HTML Parser
-This project is a tool for providing HTML parsing via a REST API endpoint.
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/dereckdamphouse/html-parser)](https://goreportcard.com/report/github.com/dereckdamphouse/html-parser)
+
+This project is a tool for providing HTML parsing via a RESTful API endpoint.
 
 ## Prerequisites
 **CLI Tools**
