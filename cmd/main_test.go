@@ -84,7 +84,7 @@ func TestHandler(t *testing.T) {
 			nil,
 		},
 		{
-			"handles successfull response",
+			"handles successful response",
 			&deps{
 				unmarshal: func(body string) (*req.Data, error) {
 					return &req.Data{}, nil
